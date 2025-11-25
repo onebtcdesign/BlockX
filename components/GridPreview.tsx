@@ -91,8 +91,9 @@ const GridPreview: React.FC<GridPreviewProps> = ({
     return () => window.removeEventListener('mouseup', handleMouseUp);
   }, [isDragging]);
 
-  // 1x1 Transparent SVG for Square Mode Layout Driver
-  const SQUARE_SVG_DATA = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxIiBoZWlnaHQ9IjEiIHZpZXdCb3g9IjAgMCAxIDEiPjwvc3ZnPg==";
+  // 1000x1000 Transparent SVG for Square Mode Layout Driver
+  // Using a larger dimension ensures the container doesn't collapse to 1px
+  const SQUARE_SVG_DATA = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAwIiBoZWlnaHQ9IjEwMDAiIHZpZXdCb3g9IjAgMCAxIDEiPjwvc3ZnPg==";
 
   return (
     <div className="flex flex-col h-full w-full select-none">
