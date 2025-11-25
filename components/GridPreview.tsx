@@ -138,8 +138,8 @@ const GridPreview: React.FC<GridPreviewProps> = ({
                 draggable={false}
                 className="absolute inset-0 w-full h-full pointer-events-none select-none"
                 style={{
-                    // Square mode covers the square viewport, Original mode fills the original viewport
-                    objectFit: settings.cropMode === 'square' ? 'cover' : 'fill', 
+                    // FIX: use 'contain' instead of 'fill' for original mode to prevent vertical stretching/compression
+                    objectFit: settings.cropMode === 'square' ? 'cover' : 'contain', 
                     transform: `translate(${settings.offsetX}px, ${settings.offsetY}px) scale(${settings.scale})`,
                     transformOrigin: 'center',
                     transition: isDragging ? 'none' : 'transform 0.1s ease-out',

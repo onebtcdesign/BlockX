@@ -2,7 +2,7 @@ import React from 'react';
 import { GridSettings, ImageInfo, ProcessingState } from '../types';
 import { Card } from './ui/Card';
 import Button from './ui/Button';
-import { Download, Grid, Crop, AlertCircle, ImageOff, ZoomIn, Move } from 'lucide-react';
+import { Download, Grid, Crop, AlertCircle, ImageOff, ZoomIn, Move, Minus, Plus } from 'lucide-react';
 import { processAndDownload } from '../utils/imageProcessing';
 
 interface SidebarProps {
@@ -56,6 +56,12 @@ const Sidebar: React.FC<SidebarProps> = ({
     } else {
         setSettings(prev => ({ ...prev, [field]: value as any }));
     }
+  };
+
+  const handleZoomStep = (amount: number) => {
+    // Clamp between 0.5 and 3, fix float precision
+    const newScale = Math.min(3, Math.max(0.5, settings.scale + amount));
+    handleInputChange('scale', Number(newScale.toFixed(2)));
   };
 
   return (
@@ -139,13 +145,35 @@ const Sidebar: React.FC<SidebarProps> = ({
                      <span className="flex items-center gap-1"><ZoomIn size={12}/> 缩放</span>
                      <span>{Math.round(settings.scale * 100)}%</span>
                  </div>
-                 <input 
-                    type="range" min="0.5" max="3" step="0.05"
-                    disabled={isDisabled}
-                    value={settings.scale}
-                    onChange={(e) => handleInputChange('scale', parseFloat(e.target.value))}
-                    className="w-full h-1.5 bg-apple-gray rounded-lg appearance-none cursor-pointer accent-apple-text disabled:opacity-50"
-                 />
+                 
+                 <div className="flex items-center gap-2">
+                     <button 
+                         onClick={() => handleZoomStep(-0.01)}
+                         disabled={isDisabled}
+                         className="w-6 h-6 flex items-center justify-center rounded-full bg-apple-gray hover:bg-gray-200 text-apple-text transition-colors disabled:opacity-50"
+                         title="缩小 (-1%)"
+                     >
+                         <Minus size={12} />
+                     </button>
+                     
+                     <input 
+                        type="range" min="0.5" max="3" step="0.01"
+                        disabled={isDisabled}
+                        value={settings.scale}
+                        onChange={(e) => handleInputChange('scale', parseFloat(e.target.value))}
+                        className="flex-1 h-1.5 bg-apple-gray rounded-lg appearance-none cursor-pointer accent-apple-text disabled:opacity-50"
+                     />
+
+                     <button 
+                         onClick={() => handleZoomStep(0.01)}
+                         disabled={isDisabled}
+                         className="w-6 h-6 flex items-center justify-center rounded-full bg-apple-gray hover:bg-gray-200 text-apple-text transition-colors disabled:opacity-50"
+                         title="放大 (+1%)"
+                     >
+                         <Plus size={12} />
+                     </button>
+                 </div>
+
                  <p className="text-[9px] text-apple-subtext text-center mt-1">
                      提示：在左侧预览图中可直接拖拽移动图片
                  </p>
