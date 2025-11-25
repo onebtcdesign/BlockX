@@ -60,7 +60,7 @@ const GridPreview: React.FC<GridPreviewProps> = ({
   return (
     <div className="flex flex-col h-full w-full">
       {/* Image Display Area */}
-      <div className="flex-1 flex items-center justify-center min-h-0 w-full relative overflow-hidden p-2">
+      <div className="flex-1 flex items-center justify-center min-h-0 w-full relative overflow-hidden p-0 md:p-1">
         <div className="relative inline-block shadow-sm" style={{ maxWidth: '100%', maxHeight: '100%' }}>
           
           {/* Main Image */}
@@ -73,7 +73,8 @@ const GridPreview: React.FC<GridPreviewProps> = ({
               // For square mode, we force the aspect ratio to 1:1 and cover the area (center crop simulation)
               aspectRatio: settings.cropMode === 'square' ? '1/1' : 'auto',
               objectFit: settings.cropMode === 'square' ? 'cover' : 'contain',
-              maxHeight: 'calc(92vh - 120px)' // Prevent overflow on smaller screens
+              // Dynamic height constraint: adapt to parent container
+              maxHeight: '100%' 
             }}
           />
 
@@ -114,8 +115,8 @@ const GridPreview: React.FC<GridPreviewProps> = ({
       </div>
 
       {/* Info Footer */}
-      <div className="flex-shrink-0 mt-2 pt-2 border-t border-apple-border/40 flex items-center justify-between text-xs text-apple-subtext px-2">
-        <div className="flex gap-4">
+      <div className="flex-shrink-0 mt-1 md:mt-2 pt-2 border-t border-apple-border/40 flex items-center justify-between text-[10px] md:text-xs text-apple-subtext px-1 md:px-2">
+        <div className="flex gap-2 md:gap-4">
           <span>原始: {imageInfo.width} × {imageInfo.height}</span>
           <span>模式: {settings.cropMode === 'square' ? '正方形' : '原比例'}</span>
         </div>

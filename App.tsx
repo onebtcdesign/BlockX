@@ -4,7 +4,8 @@ import GridPreview from './components/GridPreview';
 import Sidebar from './components/Sidebar';
 import { ImageInfo, GridSettings, ProcessingState } from './types';
 import { DEFAULT_SETTINGS } from './constants';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Upload, CheckSquare, XSquare, RefreshCw } from 'lucide-react';
+import Button from './components/ui/Button';
 
 const App: React.FC = () => {
   const [imageInfo, setImageInfo] = useState<ImageInfo | null>(null);
@@ -20,7 +21,7 @@ const App: React.FC = () => {
   // Reset when new image loads
   const handleImageSelected = useCallback((info: ImageInfo) => {
     setImageInfo(info);
-    setSettings(prev => ({ ...DEFAULT_SETTINGS, rows: prev.rows, cols: prev.cols })); // Keep grid choice, reset others
+    setSettings(prev => ({ ...DEFAULT_SETTINGS, rows: prev.rows, cols: prev.cols }));
     setSelectedIndices(new Set());
     setGlobalError(null);
   }, []);
@@ -50,8 +51,8 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen w-full bg-apple-gray p-4 flex items-center justify-center font-sans">
-      <div className="w-full max-w-7xl h-[92vh] flex flex-col md:flex-row gap-6">
+    <div className="min-h-screen w-full bg-apple-gray p-2 md:p-4 flex items-center justify-center font-sans">
+      <div className="w-full max-w-7xl flex flex-col md:flex-row gap-3 md:h-[90vh]">
         
         {/* Global Error Toast */}
         {globalError && (
@@ -62,16 +63,55 @@ const App: React.FC = () => {
         )}
 
         {/* LEFT PANEL: Preview / Upload */}
-        <div className="flex-1 bg-white rounded-[32px] border border-apple-border/60 p-4 md:p-6 shadow-sm relative overflow-hidden flex flex-col">
-          <div className="flex justify-between items-center mb-2 flex-shrink-0">
-             <div className="flex items-center gap-3">
-               <div className="w-3 h-3 rounded-full bg-red-400"></div>
-               <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
-               <div className="w-3 h-3 rounded-full bg-green-400"></div>
+        {/* Mobile: fixed height (50vh) or min-height. Desktop: full height. */}
+        <div className="flex-1 bg-white rounded-[24px] md:rounded-[32px] border border-apple-border/60 p-3 md:p-5 shadow-sm relative overflow-hidden flex flex-col h-[55vh] md:h-full min-h-[400px]">
+          
+          {/* Header with Traffic Lights & Actions */}
+          <div className="flex justify-between items-center mb-2 flex-shrink-0 min-h-[32px]">
+             <div className="flex items-center gap-2">
+               <div className="flex gap-1.5 mr-2">
+                 <div className="w-3 h-3 rounded-full bg-red-400"></div>
+                 <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
+                 <div className="w-3 h-3 rounded-full bg-green-400"></div>
+               </div>
+               <span className="text-xs font-medium text-apple-subtext uppercase tracking-widest hidden sm:inline-block">
+                 预览
+               </span>
              </div>
-             <div className="text-xs font-medium text-apple-subtext uppercase tracking-widest">
-               预览
-             </div>
+
+             {/* Top Actions (Moved from Sidebar) */}
+             {imageInfo && (
+               <div className="flex items-center gap-2">
+                 <Button 
+                   variant="ghost" 
+                   onClick={handleSelectAll} 
+                   className="h-7 px-2 text-xs flex items-center gap-1 hover:bg-gray-100 rounded-lg text-apple-text"
+                   title="全选"
+                 >
+                   <CheckSquare size={14} />
+                   <span className="hidden sm:inline">全选</span>
+                 </Button>
+                 <Button 
+                   variant="ghost" 
+                   onClick={handleSelectNone} 
+                   className="h-7 px-2 text-xs flex items-center gap-1 hover:bg-gray-100 rounded-lg text-apple-text"
+                   title="重置选中"
+                 >
+                   <XSquare size={14} />
+                   <span className="hidden sm:inline">重置</span>
+                 </Button>
+                 <div className="w-px h-4 bg-gray-200 mx-1"></div>
+                 <Button 
+                   variant="ghost" 
+                   onClick={handleReset} 
+                   className="h-7 px-2 text-xs flex items-center gap-1 hover:bg-gray-100 rounded-lg text-apple-blue font-medium"
+                   title="重新上传"
+                 >
+                   <Upload size={14} />
+                   <span className="hidden sm:inline">重新上传</span>
+                 </Button>
+               </div>
+             )}
           </div>
 
           <div className="flex-1 min-h-0 w-full relative">
@@ -84,7 +124,7 @@ const App: React.FC = () => {
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
-                 <div className="w-full max-w-md aspect-square md:aspect-auto">
+                 <div className="w-full max-w-md p-4">
                     <ImageUploader onImageSelected={handleImageSelected} onError={handleError} />
                  </div>
               </div>
@@ -93,19 +133,17 @@ const App: React.FC = () => {
         </div>
 
         {/* RIGHT PANEL: Controls */}
-        <div className="w-full md:w-[360px] flex-shrink-0 flex flex-col h-full">
+        <div className="w-full md:w-[340px] flex-shrink-0 flex flex-col h-auto md:h-full">
            <Sidebar 
              imageInfo={imageInfo}
              settings={settings}
              setSettings={setSettings}
-             onReset={handleReset}
+             onReset={handleReset} 
              selectedCount={selectedIndices.size}
              totalSlices={settings.rows * settings.cols}
              processingState={processingState}
              setProcessingState={setProcessingState}
              selectedIndices={selectedIndices}
-             onSelectAll={handleSelectAll}
-             onResetSelection={handleSelectNone}
            />
         </div>
       </div>
