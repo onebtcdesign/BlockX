@@ -1,6 +1,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import Navbar from './components/Navbar';
 import ImageUploader from './components/ImageUploader';
 import GridPreview from './components/GridPreview';
@@ -186,6 +187,7 @@ const App: React.FC = () => {
         </div>
       </div>
       <Analytics />
+      <SpeedInsights />
     </>
   );
 };
