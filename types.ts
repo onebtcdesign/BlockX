@@ -23,6 +23,11 @@ export interface GridSettings {
   // offsetX/Y: Percentage of viewport width/height (-0.5 to 0.5 usually)
   offsetX: number;
   offsetY: number;
+  // Padding: pixels to crop from each edge before slicing
+  paddingTop: number;
+  paddingBottom: number;
+  paddingLeft: number;
+  paddingRight: number;
 }
 
 export interface ProcessingState {

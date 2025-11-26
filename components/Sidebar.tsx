@@ -3,7 +3,7 @@ import React from 'react';
 import { GridSettings, ImageInfo, ProcessingState } from '../types';
 import { Card } from './ui/Card';
 import Button from './ui/Button';
-import { Download, Grid, Move, Minus, Plus, ArrowLeftRight, ArrowUpDown, RefreshCw } from 'lucide-react';
+import { Download, Grid, Move, Minus, Plus, ArrowLeftRight, ArrowUpDown, RefreshCw, Crop } from 'lucide-react';
 import { processAndDownload } from '../utils/imageProcessing';
 
 interface SidebarProps {
@@ -160,7 +160,52 @@ const Sidebar: React.FC<SidebarProps> = ({
                      提示：也可在预览区使用滚轮缩放，拖拽移动
                  </p>
              </div>
-             
+
+             {/* Padding Controls */}
+             <div className="flex flex-col gap-2 pt-3 border-t border-apple-border/40">
+                <label className="text-[10px] font-medium text-apple-text flex items-center gap-1">
+                    <Crop size={12}/> 边距调整 (像素)
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-1">
+                        <label className="text-[9px] text-apple-subtext">上边距</label>
+                        <input
+                            type="number" min="0" max="500" step="1" disabled={isDisabled}
+                            value={settings.paddingTop}
+                            onChange={(e) => handleInputChange('paddingTop', Math.max(0, parseInt(e.target.value) || 0))}
+                            className="w-full px-2 py-1.5 bg-apple-gray rounded-lg text-center text-sm focus:outline-none focus:ring-2 focus:ring-apple-blue/20 transition-all disabled:opacity-50"
+                        />
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-[9px] text-apple-subtext">下边距</label>
+                        <input
+                            type="number" min="0" max="500" step="1" disabled={isDisabled}
+                            value={settings.paddingBottom}
+                            onChange={(e) => handleInputChange('paddingBottom', Math.max(0, parseInt(e.target.value) || 0))}
+                            className="w-full px-2 py-1.5 bg-apple-gray rounded-lg text-center text-sm focus:outline-none focus:ring-2 focus:ring-apple-blue/20 transition-all disabled:opacity-50"
+                        />
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-[9px] text-apple-subtext">左边距</label>
+                        <input
+                            type="number" min="0" max="500" step="1" disabled={isDisabled}
+                            value={settings.paddingLeft}
+                            onChange={(e) => handleInputChange('paddingLeft', Math.max(0, parseInt(e.target.value) || 0))}
+                            className="w-full px-2 py-1.5 bg-apple-gray rounded-lg text-center text-sm focus:outline-none focus:ring-2 focus:ring-apple-blue/20 transition-all disabled:opacity-50"
+                        />
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-[9px] text-apple-subtext">右边距</label>
+                        <input
+                            type="number" min="0" max="500" step="1" disabled={isDisabled}
+                            value={settings.paddingRight}
+                            onChange={(e) => handleInputChange('paddingRight', Math.max(0, parseInt(e.target.value) || 0))}
+                            className="w-full px-2 py-1.5 bg-apple-gray rounded-lg text-center text-sm focus:outline-none focus:ring-2 focus:ring-apple-blue/20 transition-all disabled:opacity-50"
+                        />
+                    </div>
+                </div>
+             </div>
+
              {/* Format */}
              <div className="flex flex-col gap-1.5 pt-2 border-t border-apple-border/40">
                 <label className="text-[10px] font-medium text-apple-text">导出格式</label>
