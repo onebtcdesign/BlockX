@@ -76,13 +76,13 @@ const App: React.FC = () => {
 
   return (
     <>
-    {/* Mobile Navbar */}
-    <div className="md:hidden">
-      <Navbar mobile={true} />
-    </div>
+      {/* Mobile Navbar */}
+      <div className="md:hidden">
+        <Navbar mobile={true} />
+      </div>
 
-    <div className="min-h-screen w-full bg-apple-gray p-2 md:p-4 pt-20 md:pt-4 flex items-center justify-center font-sans">
-      <div className="w-full max-w-7xl flex flex-col md:flex-row gap-3 md:h-[90vh]">
+      <div className="min-h-screen w-full bg-apple-gray p-2 md:p-4 pt-20 md:pt-4 flex items-center justify-center font-sans">
+        <div className="w-full max-w-7xl flex flex-col md:flex-row gap-3 md:h-[90vh]">
 
         {globalError && (
           <div className="fixed top-24 md:top-6 left-1/2 -translate-x-1/2 z-50 bg-white/80 backdrop-blur-md border border-red-200 text-red-600 px-6 py-3 rounded-full shadow-lg flex items-center gap-2 animate-bounce">
@@ -183,9 +183,9 @@ const App: React.FC = () => {
              selectedIndices={selectedIndices}
            />
         </div>
+        </div>
       </div>
-    </div>
-    <Analytics />
+      <Analytics />
     </>
   );
 };
