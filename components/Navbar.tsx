@@ -34,7 +34,7 @@ const Navbar: React.FC<NavbarProps> = ({ mobile = false }) => {
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg overflow-hidden bg-apple-gray/50 flex items-center justify-center">
                 <img
-                  src="/images/logo-icon.png"
+                  src="public/images/logo-icon.png"
                   alt="BlockSlice Logo"
                   className="w-5 h-5 object-contain rounded"
                 />
@@ -77,7 +77,7 @@ const Navbar: React.FC<NavbarProps> = ({ mobile = false }) => {
         <div className="flex flex-col items-center gap-1">
           <div className="w-9 h-9 rounded-xl overflow-hidden bg-apple-gray/50 flex items-center justify-center">
             <img
-              src="/images/logo-icon.png"
+              src="public/images/logo-icon.png"
               alt="BlockSlice Logo"
               className="w-6 h-6 object-contain rounded-lg"
             />
