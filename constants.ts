@@ -12,7 +12,12 @@ export const DEFAULT_SETTINGS: GridSettings = {
   scaleX: 1,
   scaleY: 1,
   offsetX: 0,
-  offsetY: 0
+  offsetY: 0,
+  paddingTop: 0,
+  paddingRight: 0,
+  paddingBottom: 0,
+  paddingLeft: 0,
+  filePrefix: ''
 };
 
 export const SUPPORTED_FORMATS = ['image/png', 'image/jpeg', 'image/webp', 'image/jpg'];

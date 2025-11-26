@@ -37,15 +37,15 @@ export const processAndDownload = async (
   onProgress: (percent: number) => void
 ) => {
   const { src, originalName } = imageInfo;
-  const { rows, cols, format, cropMode, scaleX, scaleY, offsetX, offsetY } = settings;
+  const { rows, cols, format, cropMode, scaleX, scaleY, offsetX, offsetY, paddingTop, paddingRight, paddingBottom, paddingLeft, filePrefix } = settings;
 
   try {
     const img = await loadImage(src);
     const zip = new JSZip();
-    
+
     // 1. Determine Viewport Dimensions (The total size of the grid)
     const viewport = getViewportDimensions(img.width, img.height, cropMode);
-    
+
     // 2. Create a canvas representing the Viewport
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
@@ -57,7 +57,7 @@ export const processAndDownload = async (
     // 3. Draw the image onto the viewport with transformations
     // Clear background
     ctx.clearRect(0, 0, viewport.width, viewport.height);
-    
+
     // Calculate draw dimensions based on independent scales
     const drawWidth = img.width * scaleX;
     const drawHeight = img.height * scaleY;
@@ -74,13 +74,13 @@ export const processAndDownload = async (
     // Draw the processed image to the master canvas
     ctx.drawImage(img, finalX, finalY, drawWidth, drawHeight);
 
-    // 4. Slice Generation
+    // 4. Slice Generation with Padding
     const sliceWidth = viewport.width / cols;
     const sliceHeight = viewport.height / rows;
 
     const totalSlices = rows * cols;
-    const slicesToExport = selectedIndices.size > 0 
-      ? Array.from(selectedIndices) 
+    const slicesToExport = selectedIndices.size > 0
+      ? Array.from(selectedIndices)
       : Array.from({ length: totalSlices }, (_, i) => i);
 
     let processedCount = 0;
@@ -89,20 +89,30 @@ export const processAndDownload = async (
     const sliceCtx = sliceCanvas.getContext('2d');
     if (!sliceCtx) throw new Error("Ctx error");
 
-    sliceCanvas.width = sliceWidth;
-    sliceCanvas.height = sliceHeight;
+    // Calculate actual output dimensions after padding
+    const outputWidth = Math.max(1, Math.floor(sliceWidth - paddingLeft - paddingRight));
+    const outputHeight = Math.max(1, Math.floor(sliceHeight - paddingTop - paddingBottom));
+
+    sliceCanvas.width = outputWidth;
+    sliceCanvas.height = outputHeight;
 
     for (const index of slicesToExport) {
       const row = Math.floor(index / cols);
       const col = index % cols;
 
-      sliceCtx.clearRect(0, 0, sliceWidth, sliceHeight);
+      sliceCtx.clearRect(0, 0, outputWidth, outputHeight);
 
-      // Draw from master canvas to slice canvas
+      // Calculate source coordinates with padding offset
+      const srcX = col * sliceWidth + paddingLeft;
+      const srcY = row * sliceHeight + paddingTop;
+      const srcWidth = sliceWidth - paddingLeft - paddingRight;
+      const srcHeight = sliceHeight - paddingTop - paddingBottom;
+
+      // Draw from master canvas to slice canvas with padding applied
       sliceCtx.drawImage(
         canvas,
-        col * sliceWidth, row * sliceHeight, sliceWidth, sliceHeight, // Source
-        0, 0, sliceWidth, sliceHeight    // Dest
+        srcX, srcY, srcWidth, srcHeight,  // Source with padding offset
+        0, 0, outputWidth, outputHeight    // Dest (full canvas)
       );
 
       const blob = await new Promise<Blob | null>((resolve) => {
@@ -112,13 +122,13 @@ export const processAndDownload = async (
 
       if (blob) {
         const ext = format === 'jpg' ? 'jpg' : format;
-        const nameWithoutExt = originalName.substring(0, originalName.lastIndexOf('.')) || originalName;
-        const filename = `${nameWithoutExt}_${row + 1}_${col + 1}.${ext}`;
+        const baseName = filePrefix || originalName.substring(0, originalName.lastIndexOf('.')) || 'sliced';
+        const filename = `${baseName}_${row + 1}_${col + 1}.${ext}`;
         zip.file(filename, blob);
       }
 
       processedCount++;
-      onProgress(Math.round((processedCount / slicesToExport.length) * 50)); 
+      onProgress(Math.round((processedCount / slicesToExport.length) * 50));
     }
 
     onProgress(60);
@@ -127,8 +137,9 @@ export const processAndDownload = async (
     });
 
     onProgress(100);
-    const zipName = `${originalName.substring(0, originalName.lastIndexOf('.')) || 'sliced'}_grid.zip`;
-    
+    const baseNameForZip = filePrefix || originalName.substring(0, originalName.lastIndexOf('.')) || 'sliced';
+    const zipName = `${baseNameForZip}_grid.zip`;
+
     const saveAs = (FileSaver as any).saveAs || FileSaver;
     saveAs(content, zipName);
 

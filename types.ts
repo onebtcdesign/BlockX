@@ -23,6 +23,13 @@ export interface GridSettings {
   // offsetX/Y: Percentage of viewport width/height (-0.5 to 0.5 usually)
   offsetX: number;
   offsetY: number;
+  // Padding (margin) settings in pixels
+  paddingTop: number;
+  paddingRight: number;
+  paddingBottom: number;
+  paddingLeft: number;
+  // File naming
+  filePrefix: string;
 }
 
 export interface ProcessingState {

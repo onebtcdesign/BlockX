@@ -1,13 +1,15 @@
 
 import React, { useState, useCallback } from 'react';
 import { Analytics } from '@vercel/analytics/react';
+import Navbar from './components/Navbar';
 import ImageUploader from './components/ImageUploader';
 import GridPreview from './components/GridPreview';
 import Sidebar from './components/Sidebar';
 import { ImageInfo, GridSettings, ProcessingState } from './types';
 import { DEFAULT_SETTINGS } from './constants';
-import { AlertCircle, Upload, CheckSquare, XSquare } from 'lucide-react';
+import { AlertCircle, Upload, CheckSquare, XSquare, Sparkles } from 'lucide-react';
 import Button from './components/ui/Button';
+import { suggestGridDimensions } from './utils/gridDetection';
 
 const App: React.FC = () => {
   const [imageInfo, setImageInfo] = useState<ImageInfo | null>(null);
@@ -19,19 +21,29 @@ const App: React.FC = () => {
     error: null
   });
   const [globalError, setGlobalError] = useState<string | null>(null);
+  const [suggestion, setSuggestion] = useState<string | null>(null);
 
   // Reset when new image loads
   const handleImageSelected = useCallback((info: ImageInfo) => {
     setImageInfo(info);
-    setSettings(prev => ({ 
-      ...DEFAULT_SETTINGS, 
-      rows: prev.rows, 
-      cols: prev.cols,
+
+    // Auto-suggest grid dimensions
+    const gridSuggestion = suggestGridDimensions(info.width, info.height);
+
+    setSettings({
+      ...DEFAULT_SETTINGS,
+      rows: gridSuggestion.rows,
+      cols: gridSuggestion.cols,
       // Reset transform on new image
-      scaleX: 1, scaleY: 1, offsetX: 0, offsetY: 0 
-    }));
+      scaleX: 1, scaleY: 1, offsetX: 0, offsetY: 0
+    });
+
     setSelectedIndices(new Set());
     setGlobalError(null);
+
+    // Show suggestion notification
+    setSuggestion(gridSuggestion.reason);
+    setTimeout(() => setSuggestion(null), 4000);
   }, []);
 
   const handleReset = () => {
@@ -64,15 +76,32 @@ const App: React.FC = () => {
 
   return (
     <>
-    <div className="min-h-screen w-full bg-apple-gray p-2 md:p-4 flex items-center justify-center font-sans">
+    {/* Mobile Navbar */}
+    <div className="md:hidden">
+      <Navbar mobile={true} />
+    </div>
+
+    <div className="min-h-screen w-full bg-apple-gray p-2 md:p-4 pt-20 md:pt-4 flex items-center justify-center font-sans">
       <div className="w-full max-w-7xl flex flex-col md:flex-row gap-3 md:h-[90vh]">
-        
+
         {globalError && (
-          <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-white/80 backdrop-blur-md border border-red-200 text-red-600 px-6 py-3 rounded-full shadow-lg flex items-center gap-2 animate-bounce">
+          <div className="fixed top-24 md:top-6 left-1/2 -translate-x-1/2 z-50 bg-white/80 backdrop-blur-md border border-red-200 text-red-600 px-6 py-3 rounded-full shadow-lg flex items-center gap-2 animate-bounce">
             <AlertCircle size={18} />
             <span className="font-medium text-sm">{globalError}</span>
           </div>
         )}
+
+        {suggestion && (
+          <div className="fixed top-24 md:top-6 left-1/2 -translate-x-1/2 z-50 bg-apple-blue/90 backdrop-blur-md text-white px-6 py-3 rounded-full shadow-lg flex items-center gap-2 animate-pulse">
+            <Sparkles size={18} />
+            <span className="font-medium text-sm">{suggestion}</span>
+          </div>
+        )}
+
+        {/* Desktop Navbar - integrated in layout */}
+        <div className="hidden md:block">
+          <Navbar />
+        </div>
 
         {/* LEFT PANEL: Preview / Upload */}
         {/* Mobile: fixed height (50vh) or min-height to ensure image shows. Desktop: full height. */}

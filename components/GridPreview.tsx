@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { GridSettings, ImageInfo } from '../types';
 import { getViewportDimensions } from '../utils/imageProcessing';
+import GridResizer from './GridResizer';
 
 interface GridPreviewProps {
   imageInfo: ImageInfo;
@@ -109,8 +110,8 @@ const GridPreview: React.FC<GridPreviewProps> = ({
 
   const handleGridClick = (index: number) => {
     // Only select if it was a click, not a drag
-    if (hasMoved) return; 
-    
+    if (hasMoved) return;
+
     const newSet = new Set(selectedIndices);
     if (newSet.has(index)) {
       newSet.delete(index);
@@ -118,6 +119,14 @@ const GridPreview: React.FC<GridPreviewProps> = ({
       newSet.add(index);
     }
     onSelectionChange(newSet);
+  };
+
+  const handleGridResize = (rows: number, cols: number) => {
+    if (onSettingsChange) {
+      onSettingsChange({ rows, cols });
+      // Clear selection when grid changes
+      onSelectionChange(new Set());
+    }
   };
 
   useEffect(() => {
@@ -185,7 +194,7 @@ const GridPreview: React.FC<GridPreviewProps> = ({
             />
             
             {/* GRID OVERLAY */}
-            <div 
+            <div
                 className="absolute inset-0 grid z-20 pointer-events-none"
                 style={{
                     gridTemplateColumns: `repeat(${settings.cols}, 1fr)`,
@@ -194,18 +203,34 @@ const GridPreview: React.FC<GridPreviewProps> = ({
             >
                 {Array.from({ length: settings.rows * settings.cols }).map((_, i) => {
                     const isSelected = selectedIndices.has(i);
+                    const hasPadding = settings.paddingTop > 0 || settings.paddingRight > 0 ||
+                                      settings.paddingBottom > 0 || settings.paddingLeft > 0;
+
                     return (
                         <div
                             key={i}
                             style={{ pointerEvents: 'auto' }}
                             onMouseUp={() => handleGridClick(i)}
                             className={`
-                                relative border border-dashed border-red-500/60 
+                                relative border border-dashed border-red-500/60
                                 transition-colors duration-75
                                 hover:bg-red-500/10
                                 ${isSelected ? 'bg-red-500/20 ring-1 ring-inset ring-red-500 border-solid' : ''}
                             `}
                         >
+                            {/* Padding visualization */}
+                            {hasPadding && (
+                                <div
+                                    className="absolute border-2 border-dashed border-blue-500/50"
+                                    style={{
+                                        top: `${(settings.paddingTop / blockHeight) * 100}%`,
+                                        right: `${(settings.paddingRight / blockWidth) * 100}%`,
+                                        bottom: `${(settings.paddingBottom / blockHeight) * 100}%`,
+                                        left: `${(settings.paddingLeft / blockWidth) * 100}%`,
+                                    }}
+                                />
+                            )}
+
                             {isSelected && (
                                 <div className="absolute top-0.5 left-0.5 bg-red-500 text-white text-[9px] w-3.5 h-3.5 rounded-full flex items-center justify-center shadow-sm font-bold">
                                 ✓
@@ -215,6 +240,13 @@ const GridPreview: React.FC<GridPreviewProps> = ({
                     );
                 })}
             </div>
+
+            {/* GRID RESIZER - Interactive drag handles */}
+            <GridResizer
+                rows={settings.rows}
+                cols={settings.cols}
+                onGridChange={handleGridResize}
+            />
         </div>
       </div>
 
