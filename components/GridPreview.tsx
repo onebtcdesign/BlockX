@@ -31,9 +31,11 @@ const GridPreview: React.FC<GridPreviewProps> = ({
     return getViewportDimensions(imageInfo.width, imageInfo.height, settings.cropMode);
   }, [imageInfo, settings.cropMode]);
 
-  // UI Grid dimensions (Logical)
-  const blockWidth = Math.round(viewportDims.width / settings.cols);
-  const blockHeight = Math.round(viewportDims.height / settings.rows);
+  // UI Grid dimensions (Logical) - accounting for padding
+  const usableWidth = viewportDims.width - settings.paddingLeft - settings.paddingRight;
+  const usableHeight = viewportDims.height - settings.paddingTop - settings.paddingBottom;
+  const blockWidth = Math.round(usableWidth / settings.cols);
+  const blockHeight = Math.round(usableHeight / settings.rows);
 
   // Mouse Wheel Zoom Logic
   useEffect(() => {
@@ -184,10 +186,48 @@ const GridPreview: React.FC<GridPreviewProps> = ({
                 }}
             />
             
+            {/* PADDING VISUALIZATION - Shows excluded areas */}
+            {(settings.paddingTop > 0 || settings.paddingBottom > 0 || settings.paddingLeft > 0 || settings.paddingRight > 0) && (
+                <div className="absolute inset-0 z-10 pointer-events-none">
+                    {/* Top Padding */}
+                    {settings.paddingTop > 0 && (
+                        <div
+                            className="absolute top-0 left-0 right-0 bg-blue-500/10 border-b border-blue-500/40"
+                            style={{ height: `${(settings.paddingTop / viewportDims.height) * 100}%` }}
+                        />
+                    )}
+                    {/* Bottom Padding */}
+                    {settings.paddingBottom > 0 && (
+                        <div
+                            className="absolute bottom-0 left-0 right-0 bg-blue-500/10 border-t border-blue-500/40"
+                            style={{ height: `${(settings.paddingBottom / viewportDims.height) * 100}%` }}
+                        />
+                    )}
+                    {/* Left Padding */}
+                    {settings.paddingLeft > 0 && (
+                        <div
+                            className="absolute top-0 bottom-0 left-0 bg-blue-500/10 border-r border-blue-500/40"
+                            style={{ width: `${(settings.paddingLeft / viewportDims.width) * 100}%` }}
+                        />
+                    )}
+                    {/* Right Padding */}
+                    {settings.paddingRight > 0 && (
+                        <div
+                            className="absolute top-0 bottom-0 right-0 bg-blue-500/10 border-l border-blue-500/40"
+                            style={{ width: `${(settings.paddingRight / viewportDims.width) * 100}%` }}
+                        />
+                    )}
+                </div>
+            )}
+
             {/* GRID OVERLAY */}
-            <div 
-                className="absolute inset-0 grid z-20 pointer-events-none"
+            <div
+                className="absolute z-20 pointer-events-none grid"
                 style={{
+                    left: `${(settings.paddingLeft / viewportDims.width) * 100}%`,
+                    top: `${(settings.paddingTop / viewportDims.height) * 100}%`,
+                    right: `${(settings.paddingRight / viewportDims.width) * 100}%`,
+                    bottom: `${(settings.paddingBottom / viewportDims.height) * 100}%`,
                     gridTemplateColumns: `repeat(${settings.cols}, 1fr)`,
                     gridTemplateRows: `repeat(${settings.rows}, 1fr)`,
                 }}

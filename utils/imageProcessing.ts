@@ -37,7 +37,8 @@ export const processAndDownload = async (
   onProgress: (percent: number) => void
 ) => {
   const { src, originalName } = imageInfo;
-  const { rows, cols, format, cropMode, scaleX, scaleY, offsetX, offsetY } = settings;
+  const { rows, cols, format, cropMode, scaleX, scaleY, offsetX, offsetY,
+          paddingTop, paddingBottom, paddingLeft, paddingRight } = settings;
 
   try {
     const img = await loadImage(src);
@@ -75,8 +76,12 @@ export const processAndDownload = async (
     ctx.drawImage(img, finalX, finalY, drawWidth, drawHeight);
 
     // 4. Slice Generation
-    const sliceWidth = viewport.width / cols;
-    const sliceHeight = viewport.height / rows;
+    // Calculate the usable area after excluding padding
+    const usableWidth = viewport.width - paddingLeft - paddingRight;
+    const usableHeight = viewport.height - paddingTop - paddingBottom;
+
+    const sliceWidth = usableWidth / cols;
+    const sliceHeight = usableHeight / rows;
 
     const totalSlices = rows * cols;
     const slicesToExport = selectedIndices.size > 0 
@@ -98,10 +103,10 @@ export const processAndDownload = async (
 
       sliceCtx.clearRect(0, 0, sliceWidth, sliceHeight);
 
-      // Draw from master canvas to slice canvas
+      // Draw from master canvas to slice canvas, starting from padding offset
       sliceCtx.drawImage(
         canvas,
-        col * sliceWidth, row * sliceHeight, sliceWidth, sliceHeight, // Source
+        paddingLeft + col * sliceWidth, paddingTop + row * sliceHeight, sliceWidth, sliceHeight, // Source
         0, 0, sliceWidth, sliceHeight    // Dest
       );
 
