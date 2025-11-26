@@ -92,19 +92,6 @@ const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onClose }) => {
               直接拿一张图片当底图，输入上面的 Prompt 就可以了。或者你可以微调一下，比如文字随机横向/竖向排列，比例 1:1 等等。生成后上传到本工具，使用 4×6 布局切割即可。
             </p>
           </div>
-
-          {/* Tips */}
-          <div className="bg-apple-gray/30 rounded-2xl p-4 border border-apple-border/40">
-            <div className="flex items-start gap-3">
-              <Sparkles size={16} className="text-apple-subtext flex-shrink-0 mt-0.5" />
-              <div>
-                <h4 className="text-xs font-semibold text-apple-text mb-1">提示</h4>
-                <p className="text-xs text-apple-subtext leading-relaxed">
-                  推荐使用 Midjourney、DALL-E 3 或其他 AI 图像生成工具。生成的图片建议为 4K 分辨率 16:9 比例，这样切割后的每个表情包质量更高。
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
